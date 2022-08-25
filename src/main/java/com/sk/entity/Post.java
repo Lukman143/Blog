@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,8 +47,7 @@ public class Post {
 	
 	@ManyToOne
 	private User user;
-	
-	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "post",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
 	private Set<Comment> comments=new HashSet<>();
 
 }

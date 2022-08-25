@@ -33,7 +33,7 @@ import com.sk.service.FileService;
 import com.sk.service.PostService;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class PostController {
 	@Autowired
 	private PostService postService;
