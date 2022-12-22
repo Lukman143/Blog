@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sk.elasticsearch.preservice.UserElasticsearchService;
 import com.sk.entity.User;
 import com.sk.exceptions.ResourceNotFoundException;
 import com.sk.payloads.UserDto;
@@ -20,14 +21,18 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepo;
 
 	@Autowired
+	private UserElasticsearchService elasticUser;
+
+	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
 
 		User user = this.dtoToUser(userDto);
-
 		User userSave = this.userRepo.save(user);
+
+		elasticUser.insertElasticUser(userSave);
 
 		return this.userToDto(userSave);
 	}
@@ -41,7 +46,9 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(userDto.getPassword());
 		user.setAbout(userDto.getAbout());
 		User userUpdate = this.userRepo.save(user);
-		return this.userToDto(userUpdate);
+		UserDto dto = this.userToDto(userUpdate);
+		UserDto edto = elasticUser.updateElasticUser(userDto, userId);
+		return edto;
 	}
 
 	@Override
@@ -49,8 +56,10 @@ public class UserServiceImpl implements UserService {
 
 		User user = this.userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", " Id ", userId));
+		UserDto edto = elasticUser.getEUserById(userId);
 
-		return this.userToDto(user);
+		// return this.userToDto(user);
+		return edto;
 	}
 
 	@Override
@@ -60,14 +69,17 @@ public class UserServiceImpl implements UserService {
 
 		// Converting list of user into list of userdto
 		List<UserDto> luserDto = luser.stream().map(user -> this.userToDto(user)).collect(Collectors.toList());
+		List<UserDto> edto = elasticUser.getEAllUsers();
 
-		return luserDto;
+		return edto;
 	}
 
 	@Override
 	public void deleteUser(Integer userId) {
 		User user = this.userRepo.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", " Id ", userId));
+		elasticUser.deleteEUser(userId);
+
 		this.userRepo.delete(user);
 	}
 
