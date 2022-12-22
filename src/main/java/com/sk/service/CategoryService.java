@@ -2,8 +2,11 @@ package com.sk.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.sk.payloads.CategoryDto;
 
+@Service
 public interface CategoryService {
 
 	// create
