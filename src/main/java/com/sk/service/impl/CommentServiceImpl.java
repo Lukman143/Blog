@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sk.elasticsearch.preservice.CommentElasticsearchService;
 import com.sk.entity.Comment;
 import com.sk.entity.Post;
 import com.sk.exceptions.ResourceNotFoundException;
@@ -24,6 +25,9 @@ public class CommentServiceImpl implements CommentService {
 	@Autowired
 	private ModelMapper modelMapper;
 
+	@Autowired
+	private CommentElasticsearchService eService;
+
 	@Override
 	public CommentDto createComment(CommentDto commentDto, Integer postId) {
 
@@ -36,6 +40,9 @@ public class CommentServiceImpl implements CommentService {
 
 		Comment savedComment = this.commentRepo.save(comment);
 
+		CommentDto eComment = eService.createEComment(commentDto, postId);
+		// return eComment;
+
 		return this.modelMapper.map(savedComment, CommentDto.class);
 	}
 
@@ -44,6 +51,8 @@ public class CommentServiceImpl implements CommentService {
 
 		Comment com = this.commentRepo.findById(commentId)
 				.orElseThrow(() -> new ResourceNotFoundException("Comment", "CommentId", commentId));
+		eService.deleteEComment(commentId);
+
 		this.commentRepo.delete(com);
 	}
 

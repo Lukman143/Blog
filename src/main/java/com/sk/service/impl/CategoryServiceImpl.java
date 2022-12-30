@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryDto createCategory(CategoryDto categoryDto) {
 		Category cat = this.modelMapper.map(categoryDto, Category.class);
 		Category addedCat = this.categoryRepo.save(cat);
-		//CategoryDto esDto = esService.createEsCategory(categoryDto);
+		CategoryDto esDto = esService.createEsCategory(categoryDto);
 		return this.modelMapper.map(addedCat, CategoryDto.class);
 		// return esDto;
 	}
@@ -45,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
 		cat.setCategoryDescription(categoryDto.getCategoryDescription());
 
 		Category updatedcat = this.categoryRepo.save(cat);
-		// CategoryDto esDto = esService.updateEsCategory(categoryDto, categoryId);
+		CategoryDto esDto = esService.updateEsCategory(categoryDto, categoryId);
 		return this.modelMapper.map(updatedcat, CategoryDto.class);
 	}
 
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		Category cat = this.categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category ", "category id", categoryId));
-		// esService.deleteESCategory(categoryId);
+		esService.deleteESCategory(categoryId);
 		this.categoryRepo.delete(cat);
 	}
 
@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public CategoryDto getCategory(Integer categoryId) {
 		Category cat = this.categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category", "category id", categoryId));
-		// CategoryDto esDto = esService.getEsCategory(categoryId);
+		CategoryDto esDto = esService.getEsCategory(categoryId);
 		return this.modelMapper.map(cat, CategoryDto.class);
 	}
 
@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> categories = this.categoryRepo.findAll();
 		List<CategoryDto> catDtos = categories.stream().map((cat) -> this.modelMapper.map(cat, CategoryDto.class))
 				.collect(Collectors.toList());
-		// List<CategoryDto> esDtos = esService.getEsCategories();
+		List<CategoryDto> esDtos = esService.getEsCategories();
 		return catDtos;
 	}
 

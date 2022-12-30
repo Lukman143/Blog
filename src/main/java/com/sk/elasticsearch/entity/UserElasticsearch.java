@@ -10,12 +10,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Document(indexName = "user")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserElasticsearch {
 	@Id
 	@Field(type = FieldType.Keyword)
@@ -33,7 +35,7 @@ public class UserElasticsearch {
 	@Field(type = FieldType.Text)
 	private String about;
 
-	//@Field(type = FieldType.Nested, includeInParent = true)
-	//private List<PostElasticsearch> post;
+	 @Field(type = FieldType.Nested, includeInParent = true)
+	 private List<PostElasticsearch> post;
 
 }

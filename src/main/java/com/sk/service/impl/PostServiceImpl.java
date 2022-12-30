@@ -1,7 +1,10 @@
 package com.sk.service.impl;
 
+import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -12,12 +15,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.sk.elasticsearch.preservice.PostElasticsearchService;
 import com.sk.entity.Category;
 import com.sk.entity.Post;
 import com.sk.entity.User;
 import com.sk.exceptions.ResourceNotFoundException;
+import com.sk.payloads.CategoryDto;
+import com.sk.payloads.CommentDto;
 import com.sk.payloads.PostDto;
 import com.sk.payloads.PostResponse;
+import com.sk.payloads.UserDto;
 import com.sk.repository.CategoryRepository;
 import com.sk.repository.PostRepo;
 import com.sk.repository.UserRepository;
@@ -37,6 +44,9 @@ public class PostServiceImpl implements PostService {
 	@Autowired
 	private CategoryRepository categoryRepo;
 
+	@Autowired
+	private PostElasticsearchService esService;
+
 	@Override
 	public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId) {
 
@@ -54,7 +64,11 @@ public class PostServiceImpl implements PostService {
 
 		Post newPost = this.postRepo.save(post);
 
-		return this.modelMapper.map(newPost, PostDto.class);
+		postDto.setAddedDate(new Date().toString());
+		postDto.setImageName("default.png");
+		PostDto eDto = esService.createEsPost(postDto, userId, categoryId);
+		// return this.modelMapper.map(newPost, PostDto.class);
+		return eDto;
 	}
 
 	@Override
@@ -66,9 +80,13 @@ public class PostServiceImpl implements PostService {
 		post.setTitle(postDto.getTitle());
 		post.setContent(postDto.getContent());
 		post.setImageName(postDto.getImageName());
-
 		Post updatedPost = this.postRepo.save(post);
-		return this.modelMapper.map(updatedPost, PostDto.class);
+		esService.updateEsPost(postDto, postId);
+		postDto.setAddedDate(new Date().toString());
+		postDto.setImageName("default.png");
+		PostDto eDto = esService.updateEsPost(postDto, postId);
+		// return this.modelMapper.map(updatedPost, PostDto.class);
+		return eDto;
 	}
 
 	@Override
@@ -76,7 +94,7 @@ public class PostServiceImpl implements PostService {
 
 		Post post = this.postRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post ", "post id", postId));
-
+		esService.deleteEsPost(postId);
 		this.postRepo.delete(post);
 
 	}
@@ -84,11 +102,15 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public List<PostDto> getAllPost1() {
 
-		List<Post> categories = this.postRepo.findAll();
-		List<PostDto> catDtos = categories.stream().map((cat) -> this.modelMapper.map(cat, PostDto.class))
-				.collect(Collectors.toList());
-
-		return catDtos;
+		/*
+		 * List<Post> categories = this.postRepo.findAll();
+		 * 
+		 * List<PostDto> catDtos = categories.stream().map((cat) ->
+		 * this.modelMapper.map(cat, PostDto.class)) .collect(Collectors.toList());
+		 */
+		List<PostDto> eList = esService.getEsAllPost1();
+		// return catDtos;
+		return eList;
 	}
 
 	@Override
@@ -122,6 +144,8 @@ public class PostServiceImpl implements PostService {
 	public PostDto getPostById(Integer postId) {
 		Post post = this.postRepo.findById(postId)
 				.orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+		PostDto eList = esService.getEsPostById(postId);
+		System.out.println("#########################" + eList);
 		return this.modelMapper.map(post, PostDto.class);
 	}
 
@@ -135,6 +159,8 @@ public class PostServiceImpl implements PostService {
 
 		List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
 				.collect(Collectors.toList());
+
+		// List<PostDto> eList = esService.getEsPostsByCategory(categoryId);
 
 		return postDtos;
 	}
@@ -159,6 +185,7 @@ public class PostServiceImpl implements PostService {
 		List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
 		List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
 				.collect(Collectors.toList());
+		List<PostDto> e=esService.searchEsPosts(keyword);
 		return postDtos;
 	}
 

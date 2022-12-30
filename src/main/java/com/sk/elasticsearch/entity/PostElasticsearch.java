@@ -13,11 +13,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 @Document(indexName = "post")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class PostElasticsearch {
 
 	@Id
@@ -36,21 +39,15 @@ public class PostElasticsearch {
 	@Field(type = FieldType.Text)
 	private String addedDate;
 
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "category_id") private CategoryElasticsearch category;
-	 */
 	@Field(type = FieldType.Nested, includeInParent = true)
-	private List<CategoryElasticsearch> category;
+	private CategoryElasticsearch category;
 
-	/*
-	 * @ManyToOne private UserElasticsearch user;
-	 * 
-	 * @OneToMany(mappedBy = "post",fetch = FetchType.EAGER,cascade =
-	 * CascadeType.ALL) private Set<CommentElasticsearch> comments=new HashSet<>();
-	 */
-	//@Field(type = FieldType.Nested, includeInParent = true)
-	//private Set<CommentElasticsearch> comments = new HashSet<>();
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private UserElasticsearch user;
+
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private Set<CommentElasticsearch> comments = new HashSet<>();
+
+	
 
 }

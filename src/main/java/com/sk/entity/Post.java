@@ -44,10 +44,11 @@ public class Post {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-	
+
 	@ManyToOne
 	private User user;
-	@OneToMany(mappedBy = "post",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-	private Set<Comment> comments=new HashSet<>();
+
+	@OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Comment> comments = new HashSet<>();
 
 }

@@ -69,6 +69,7 @@ public class PostController {
 	public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable Integer categoryId) {
 
 		List<PostDto> posts = this.postService.getPostsByCategory(categoryId);
+		
 		return new ResponseEntity<List<PostDto>>(posts, HttpStatus.OK);
 
 	}

@@ -12,12 +12,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Document(indexName = "category")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class CategoryElasticsearch {
 
 	@Id
@@ -30,12 +32,7 @@ public class CategoryElasticsearch {
 	@Field(type = FieldType.Text)
 	private String categoryDescription;
 
-	/*
-	 * @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch =
-	 * FetchType.LAZY) private List<PostElasticsearch> posts = new ArrayList<>();
-	 */
-
-	//@Field(type = FieldType.Nested, includeInParent = true)
-//	private List<PostElasticsearch> posts = new ArrayList<>();
+	@Field(type = FieldType.Nested, includeInParent = true)
+    private List<PostElasticsearch> posts = new ArrayList<>();
 
 }

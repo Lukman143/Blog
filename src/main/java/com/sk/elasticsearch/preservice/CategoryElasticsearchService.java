@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sk.elasticsearch.entity.CategoryElasticsearch;
-import com.sk.elasticsearch.entity.UserElasticsearch;
 import com.sk.elasticsearch.repository.CategoryElasticsearchRepo;
-import com.sk.entity.Category;
+import com.sk.elasticsearch.service.IndexService;
+import com.sk.elasticserach.helper.Indices;
 import com.sk.exceptions.ResourceNotFoundException;
 import com.sk.payloads.CategoryDto;
-import com.sk.payloads.UserDto;
 
 @Service
 public class CategoryElasticsearchService {
@@ -23,8 +22,14 @@ public class CategoryElasticsearchService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private IndexService service;
 
 	public CategoryDto createEsCategory(CategoryDto categoryDto) {
+		
+		boolean b = service.isIndexAvailableOrNot(Indices.CATEGORY_INDEX);
+		
 		CategoryElasticsearch cat = this.modelMapper.map(categoryDto, CategoryElasticsearch.class);
 		CategoryElasticsearch addedCat = this.categoryRepo.save(cat);
 		return this.modelMapper.map(addedCat, CategoryDto.class);

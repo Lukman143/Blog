@@ -7,10 +7,12 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class PostDto {
 
 	private Integer postId;
@@ -21,7 +23,7 @@ public class PostDto {
 
 	private String imageName = "default.png";
 
-	private Date addedDate;
+	private String addedDate;
 
 	private CategoryDto category;
 

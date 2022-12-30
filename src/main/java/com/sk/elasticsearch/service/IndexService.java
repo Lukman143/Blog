@@ -30,7 +30,6 @@ public class IndexService {
 			} else {
 				String s = index(index);
 			}
-
 		} catch (final Exception e) {
 		}
 
